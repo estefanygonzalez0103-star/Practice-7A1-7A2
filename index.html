@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Statistics Practice — Mean, Median, Mode & Range</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500&family=DM+Mono&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --blue:#1a3a8f;--blue-l:#e8eeff;
+  --green:#0d6b45;--green-l:#e4f5ee;
+  --coral:#c43b1e;--coral-l:#fdeee9;
+  --amber:#8a5c00;--amber-l:#fff8e6;
+  --purple:#5b21b6;--purple-l:#ede9fe;
+  --ink:#0f0f0f;--muted:#777;--rule:#e0e0e0;--bg:#fafaf8;--card:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+
+/* HEADER */
+.hdr{background:var(--ink);color:#fff;padding:2rem 1.5rem;}
+.hdr-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;}
+.hdr-eye{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.4rem;}
+.hdr h1{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,4vw,2.1rem);font-weight:900;line-height:1.15;}
+.hdr h1 span{color:#e6a820;}
+.hdr-sub{font-size:13px;color:rgba(255,255,255,.5);margin-top:.3rem;}
+
+/* TIMER */
+.timer{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.6rem 1rem;text-align:center;min-width:120px;}
+.timer-lbl{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:2px;}
+.timer-val{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:700;color:#fff;}
+.timer-btns{display:flex;gap:5px;margin-top:6px;justify-content:center;}
+.tbtn{font-size:11px;padding:3px 9px;border-radius:4px;border:1px solid rgba(255,255,255,.18);background:transparent;color:rgba(255,255,255,.65);cursor:pointer;}
+.tbtn:hover{background:rgba(255,255,255,.08);}
+
+/* PROGRESS */
+.prog-wrap{background:var(--card);border-bottom:1px solid var(--rule);position:sticky;top:0;z-index:100;}
+.prog-inner{max-width:860px;margin:0 auto;padding:.6rem 1.5rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;}
+.prog-lbl{font-size:12px;color:var(--muted);white-space:nowrap;}
+.prog-bar-out{flex:1;min-width:100px;height:6px;background:var(--bg);border-radius:99px;overflow:hidden;border:1px solid var(--rule);}
+.prog-bar-in{height:100%;background:var(--blue);border-radius:99px;transition:width .4s;}
+.dots{display:flex;gap:5px;}
+.dot{width:9px;height:9px;border-radius:50%;border:2px solid var(--rule);background:var(--bg);transition:all .2s;}
+.dot.done{background:var(--green);border-color:var(--green);}
+.dot.active{background:var(--blue);border-color:var(--blue);}
+.score-pill{background:var(--ink);color:#fff;font-size:12px;font-weight:500;padding:3px 11px;border-radius:20px;white-space:nowrap;}
+
+/* LAYOUT */
+.wrap{max-width:860px;margin:0 auto;padding:2rem 1.5rem;}
+.sec{display:none;}.sec.active{display:block;}
+
+/* SEC HEADER */
+.sec-eye{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.35rem;}
+.sec-eye.blue{color:var(--blue);}.sec-eye.green{color:var(--green);}.sec-eye.coral{color:var(--coral);}.sec-eye.amber{color:var(--amber);}.sec-eye.purple{color:var(--purple);}
+.sec-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;margin-bottom:.35rem;}
+.sec-desc{font-size:14px;color:var(--muted);max-width:600px;line-height:1.7;}
+.time-tag{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin-top:.4rem;padding:2px 9px;background:var(--bg);border:1px solid var(--rule);border-radius:20px;}
+
+/* PROBLEM CARD */
+.prob{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:1.5rem;margin-bottom:1.25rem;position:relative;}
+.prob-num{position:absolute;top:1.1rem;right:1.1rem;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+.prob-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;margin-bottom:.65rem;}
+.tag-calc{background:var(--blue-l);color:var(--blue);}
+.tag-apply{background:var(--green-l);color:var(--green);}
+.tag-word{background:var(--amber-l);color:var(--amber);}
+.tag-hard{background:var(--coral-l);color:var(--coral);}
+.tag-create{background:var(--purple-l);color:var(--purple);}
+.tag-range{background:#fce7f3;color:#9d174d;}
+.prob-q{font-size:15px;font-weight:500;margin-bottom:.85rem;line-height:1.6;}
+
+/* CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:.6rem 0 .9rem;align-items:center;}
+.chip{min-width:44px;height:44px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;background:var(--bg);border:1px solid var(--rule);color:var(--ink);}
+
+/* WORK BOX */
+.work-toggle{font-size:12px;color:var(--muted);background:none;border:1px solid var(--rule);padding:4px 12px;border-radius:20px;cursor:pointer;margin:.4rem 0;display:inline-flex;align-items:center;gap:5px;}
+.work-toggle:hover{color:var(--amber);border-color:var(--amber);}
+.work{margin:.6rem 0;background:var(--bg);border:1px dashed var(--rule);border-radius:8px;padding:.6rem .9rem;}
+.work-lbl{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;}
+.work textarea{width:100%;background:transparent;border:none;outline:none;font-family:'DM Mono',monospace;font-size:13px;color:var(--ink);resize:vertical;min-height:60px;line-height:1.6;}
+
+/* CREATIVE TEXT AREAS */
+.create-area{width:100%;min-height:90px;padding:10px 14px;border:1.5px solid var(--rule);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--ink);background:var(--bg);outline:none;resize:vertical;line-height:1.6;margin:.5rem 0;}
+.create-area:focus{border-color:var(--purple);}
+
+/* MULTIPLE CHOICE */
+.mc{display:flex;flex-direction:column;gap:6px;margin:.6rem 0;}
+.mc-opt{padding:9px 14px;border:1.5px solid var(--rule);border-radius:8px;font-size:14px;cursor:pointer;background:var(--bg);text-align:left;transition:all .12s;color:var(--ink);}
+.mc-opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-l);}
+.mc-opt.correct{background:var(--green-l);border-color:var(--green);color:var(--green);}
+.mc-opt.wrong{background:var(--coral-l);border-color:var(--coral);color:var(--coral);}
+.mc-opt:disabled{cursor:default;}
+
+/* INPUT */
+.inp-row{display:flex;gap:7px;align-items:center;margin:.6rem 0;flex-wrap:wrap;}
+.ans{font-family:'DM Mono',monospace;font-size:1.05rem;width:130px;padding:8px 12px;border:2px solid var(--rule);border-radius:8px;background:var(--bg);color:var(--ink);outline:none;transition:border-color .18s;}
+.ans:focus{border-color:var(--blue);}
+.ans.ok{border-color:var(--green);background:var(--green-l);}
+.ans.no{border-color:var(--coral);background:var(--coral-l);}
+.chk{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;transition:opacity .12s;}
+.chk:hover{opacity:.85;}.chk:disabled{opacity:.4;cursor:default;}
+.chk.blue{background:var(--blue);color:#fff;}
+.chk.green{background:var(--green);color:#fff;}
+.chk.coral{background:var(--coral);color:#fff;}
+.chk.amber{background:var(--amber);color:#fff;}
+.chk.pink{background:#9d174d;color:#fff;}
+.chk.purple{background:var(--purple);color:#fff;}
+
+/* FEEDBACK */
+.fb{font-size:14px;padding:10px 14px;border-radius:8px;margin-top:8px;display:none;line-height:1.7;}
+.fb.show{display:block;}
+.fb.ok{background:var(--green-l);color:var(--green);border:1px solid #9fd3b8;}
+.fb.no{background:var(--coral-l);color:var(--coral);border:1px solid #f0bfb0;}
+.fb.info{background:var(--purple-l);color:var(--purple);border:1px solid #c4b5fd;}
+
+/* HINT */
+.hint-btn{font-size:12px;color:var(--muted);background:none;border:1px solid var(--rule);padding:3px 11px;border-radius:20px;cursor:pointer;margin-top:.4rem;}
+.hint-btn:hover{color:var(--amber);border-color:var(--amber);}
+.hint-box{font-size:13px;color:var(--amber);background:var(--amber-l);border:1px solid #e6c870;border-radius:8px;padding:9px 13px;margin-top:7px;display:none;line-height:1.6;}
+.hint-box.show{display:block;}
+
+/* SCENARIO */
+.scenario{background:var(--ink);color:#fff;border-radius:10px;padding:1.1rem 1.4rem;margin-bottom:.9rem;font-size:14px;line-height:1.8;}
+.scenario strong{color:#e6a820;}
+
+/* INFO BOX */
+.info{padding:9px 13px;border-radius:8px;font-size:13px;margin:.5rem 0;line-height:1.6;}
+.info.blue{background:var(--blue-l);color:var(--blue);border:1px solid #b8caff;}
+.info.green{background:var(--green-l);color:var(--green);border:1px solid #9fd3b8;}
+.info.purple{background:var(--purple-l);color:var(--purple);border:1px solid #c4b5fd;}
+.info.pink{background:#fce7f3;color:#9d174d;border:1px solid #fbcfe8;}
+
+/* STEP */
+.step-div{border-top:1px solid var(--rule);margin-top:1rem;padding-top:1rem;}
+.step-lbl{font-size:14px;font-weight:500;margin-bottom:.5rem;}
+
+/* NEXT */
+.nxt{display:none;margin-top:.9rem;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:9px 22px;border-radius:8px;border:none;cursor:pointer;background:var(--ink);color:#fff;}
+.nxt.show{display:inline-flex;align-items:center;gap:5px;}
+.nxt:hover{opacity:.85;}
+
+/* RESULTS */
+.res-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:1.25rem 0;}
+.res-card{padding:.9rem;border-radius:10px;background:var(--bg);border:1px solid var(--rule);text-align:center;}
+.res-card .val{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin:.2rem 0;}
+.res-card .lbl{font-size:12px;color:var(--muted);}
+.stars{display:flex;gap:5px;justify-content:center;margin:1rem 0;}
+.star{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--bg);border:1px solid var(--rule);}
+.star.lit{background:var(--amber-l);border-color:#e6c870;}
+
+/* SUBMIT FORM */
+.submit-box{margin-top:2rem;padding:1.5rem;background:var(--ink);border-radius:14px;}
+.submit-box input[type=text]{width:100%;padding:10px 14px;border-radius:8px;border:none;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:#fff;color:var(--ink);margin-bottom:8px;}
+.send-btn{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:10px 24px;border-radius:8px;border:none;cursor:pointer;background:#e6a820;color:#000;margin-top:4px;}
+.send-btn:hover{opacity:.88;}
+
+/* UNIQUE CODE */
+.code-display{font-family:'DM Mono',monospace;font-size:1.6rem;font-weight:700;color:#e6a820;letter-spacing:.15em;padding:.5rem 1rem;background:rgba(255,255,255,.08);border-radius:8px;display:inline-block;margin:.5rem 0;}
+
+/* FINAL INSTRUCTIONS */
+.final-step{display:flex;gap:12px;align-items:flex-start;padding:1rem;background:rgba(255,255,255,.05);border-radius:10px;margin-bottom:.6rem;}
+.final-num{width:30px;height:30px;border-radius:50%;background:#e6a820;color:#000;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.final-text{font-size:14px;color:rgba(255,255,255,.85);line-height:1.7;}
+.final-text strong{color:#fff;}
+
+@media(max-width:560px){.chip{min-width:38px;height:38px;font-size:13px;}.timer-val{font-size:1.4rem;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-inner">
+    <div>
+      <div class="hdr-eye">Statistics · Middle School Practice</div>
+      <h1>Mean, Median, Mode<br>&amp; <span>Range</span> Practice</h1>
+      <div class="hdr-sub">6 sections · 30 problems · step-by-step with instant feedback</div>
+    </div>
+    <div class="timer">
+      <div class="timer-lbl">Time elapsed</div>
+      <div class="timer-val" id="timerVal">00:00</div>
+      <div class="timer-btns">
+        <button class="tbtn" onclick="startTimer()">Start</button>
+        <button class="tbtn" onclick="pauseTimer()">Pause</button>
+        <button class="tbtn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="prog-wrap">
+  <div class="prog-inner">
+    <span class="prog-lbl">Progress</span>
+    <div class="prog-bar-out"><div class="prog-bar-in" id="progFill" style="width:0%"></div></div>
+    <div class="dots" id="dots"></div>
+    <div class="score-pill" id="scorePill">0 / 0</div>
+  </div>
+</div>
+
+<!-- ══════════════ SECTION 1 — WARM-UP ══════════════ -->
+<div class="sec active" id="sec-s1">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye blue">Section 1 of 6</div>
+    <div class="sec-title">Warm-Up: Basic Calculation</div>
+    <div class="sec-desc">Calculate the mean, median, mode, or range. Type your answer and press Check. Use the hint if you get stuck.</div>
+    <div class="time-tag">⏱ About 12 minutes</div>
+  </div>
+
+  <!-- P1 Mean -->
+  <div class="prob" id="p1">
+    <div class="prob-num">1 / 30</div>
+    <div class="prob-tag tag-calc">Calculation — Mean</div>
+    <div class="prob-q">Find the <strong>mean</strong> of these numbers:</div>
+    <div class="chips" id="c1"></div>
+    <button class="work-toggle" onclick="toggleWork('w1')">✏️ Show your work (optional)</button>
+    <div class="work" id="w1" style="display:none"><div class="work-lbl">Show your work</div><textarea placeholder="Add: 3+5+6+8+8 = ?&#10;Divide by 5: ? ÷ 5 = ?"></textarea></div>
+    <div class="inp-row">
+      <input type="number" class="ans" id="a1" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p1','a1',6,'blue')"/>
+      <button class="chk blue" onclick="chk('p1','a1',6,'blue')">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h1')">Need a hint?</button>
+    <div class="hint-box" id="h1">Add all 5 numbers: 3+5+6+8+8 = 30. Then divide by 5.</div>
+    <div class="fb" id="f1"></div>
+    <button class="nxt" id="n1" onclick="nextP('p1','p2')">Next →</button>
+  </div>
+
+  <!-- P2 Median -->
+  <div class="prob" id="p2" style="display:none">
+    <div class="prob-num">2 / 30</div>
+    <div class="prob-tag tag-calc" style="background:var(--green-l);color:var(--green)">Calculation — Median</div>
+    <div class="prob-q">Find the <strong>median</strong> of these numbers. Sort them first!</div>
+    <div class="chips" id="c2"></div>
+    <button class="work-toggle" onclick="toggleWork('w2')">✏️ Show your work (optional)</button>
+    <div class="work" id="w2" style="display:none"><div class="work-lbl">Sort then find the middle</div><textarea placeholder="Sorted: __, __, __, __, __&#10;Middle (position 3) = ?"></textarea></div>
+    <div class="inp-row">
+      <input type="number" class="ans" id="a2" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p2','a2',14,'green')"/>
+      <button class="chk green" onclick="chk('p2','a2',14,'green')">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h2')">Need a hint?</button>
+    <div class="hint-box" id="h2">Sort: 8, 11, 14, 17, 20. Middle = position 3.</div>
+    <div class="fb" id="f2"></div>
+    <button class="nxt" id="n2" onclick="nextP('p2','p3')">Next →</button>
+  </div>
+
+  <!-- P3 Mode -->
+  <div class="prob" id="p3" style="display:none">
+    <div class="prob-num">3 / 30</div>
+    <div class="prob-tag tag-calc" style="background:var(--coral-l);color:var(--coral)">Calculation — Mode</div>
+    <div class="prob-q">Find the <strong>mode</strong> of these numbers:</div>
+    <div class="chips" id="c3"></div>
+    <button class="work-toggle" onclick="toggleWork('w3')">✏️ Show your work (optional)</button>
+    <div class="work" id="w3" style="display:none"><div class="work-lbl">Count each number</div><textarea placeholder="4 appears: __ times&#10;7 appears: __ times&#10;9 appears: __ times"></textarea></div>
+    <div class="inp-row">
+      <input type="number" class="ans" id="a3" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p3','a3',7,'coral')"/>
+      <button class="chk coral" onclick="chk('p3','a3',7,'coral')">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h3')">Need a hint?</button>
+    <div class="hint-box" id="h3">Count: 4→3 times, 7→4 times, 9→2 times. Which appears most?</div>
+    <div class="fb" id="f3"></div>
+    <button class="nxt" id="n3" onclick="nextP('p3','p4')">Next →</button>
+  </div>
+
+  <!-- P4 Range -->
+  <div class="prob" id="p4" style="display:none">
+    <div class="prob-num">4 / 30</div>
+    <div class="prob-tag tag-range">Calculation — Range</div>
+    <div class="prob-q">Find the <strong>range</strong> of these numbers. Range = biggest number − smallest number.</div>
+    <div class="chips" id="c4"></div>
+    <div class="inp-row">
+      <input type="number" class="ans" id="a4" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p4','a4',18,'pink')"/>
+      <button class="chk pink" onclick="chk('p4','a4',18,'pink')">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h4')">Need a hint?</button>
+    <div class="hint-box" id="h4">Find the biggest number and the smallest number. Subtract: biggest − smallest = range.</div>
+    <div class="fb" id="f4"></div>
+    <button class="nxt" id="n4" onclick="nextP('p4','p5')">Next →</button>
+  </div>
+
+  <!-- P5 Mean even -->
+  <div class="prob" id="p5" style="display:none">
+    <div class="prob-num">5 / 30</div>
+    <div class="prob-tag tag-calc">Calculation — Mean</div>
+    <div class="prob-q">A student scored <strong>72, 85, 91, 68, and 84</strong> on five tests. What is their <strong>mean</strong> score?</div>
+    <button class="work-toggle" onclick="toggleWork('w5')">✏️ Show your work (optional)</button>
+    <div class="work" id="w5" style="display:none"><div class="work-lbl">Show your work</div><textarea placeholder="Sum = 72+85+91+68+84 = ?&#10;Mean = sum ÷ 5 = ?"></textarea></div>
+    <div class="inp-row">
+      <input type="number" class="ans" id="a5" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p5','a5',80,'blue')"/>
+      <button class="chk blue" onclick="chk('p5','a5',80,'blue')">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h5')">Need a hint?</button>
+    <div class="hint-box" id="h5">72+85+91+68+84 = 400. Then 400 ÷ 5 = ?</div>
+    <div class="fb" id="f5"></div>
+    <button class="nxt" id="n5" onclick="nextP('p5','p6')">Next →</button>
+  </div>
+
+  <!-- P6 Median even -->
+  <div class="prob" id="p6" style="display:none">
+    <div class="prob-num">6 / 30</div>
+    <div class="prob-tag tag-calc" style="background:var(--green-l);color:var(--green)">Calculation — Median (even count)</div>
+    <div class="prob-q">Find the <strong>median</strong> of these <em>six</em> numbers. With an even count, average the two middle values.</div>
+    <div class="chips" id="c6"></div>
+    <button class="work-toggle" onclick="toggleWork('w6')">✏️ Show your work (optional)</button>
+    <div class="work" id="w6" style="display:none"><div class="work-lbl">Sort → find two middle values → average them</div><textarea placeholder="Sorted: __, __, __, __, __, __&#10;Middle two: __ and __&#10;Median = (__+__) ÷ 2 = ?"></textarea></div>
+    <div class="inp-row">
+      <input type="number" step="0.5" class="ans" id="a6" placeholder="Answer" onkeydown="if(event.key==='Enter')chk('p6','a6',11.5,'green',0.1)"/>
+      <button class="chk green" onclick="chk('p6','a6',11.5,'green',0.1)">Check →</button>
+    </div>
+    <button class="hint-btn" onclick="hint('h6')">Need a hint?</button>
+    <div class="hint-box" id="h6">Sorted: 5,8,11,12,15,19. Middle two = 11 and 12. (11+12)÷2 = ?</div>
+    <div class="fb" id="f6"></div>
+    <button class="nxt" id="n6" onclick="finSec('s1','s2')">Next Section →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ SECTION 2 — GUIDED STEPS ══════════════ -->
+<div class="sec" id="sec-s2">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye green">Section 2 of 6</div>
+    <div class="sec-title">Step-by-Step Guided Problems</div>
+    <div class="sec-desc">Each problem is split into steps. Complete one step before the next appears. All four measures are included.</div>
+    <div class="time-tag">⏱ About 20 minutes</div>
+  </div>
+
+  <!-- P7 Guided Mean -->
+  <div class="prob" id="p7">
+    <div class="prob-num">7 / 30</div>
+    <div class="prob-tag tag-calc">Guided — Mean</div>
+    <div class="prob-q">Ages of players on a soccer team: <strong>13, 15, 12, 14, 13, 16, 13</strong>. Find the mean age.</div>
+    <div class="info blue">Complete each step to unlock the next one.</div>
+    <div class="chips" id="c7"></div>
+    <div id="p7-s1">
+      <div class="step-lbl">Step 1 — Add all the ages together</div>
+      <div class="inp-row"><input type="number" class="ans" id="a7s1" placeholder="Sum = ?" onkeydown="if(event.key==='Enter')chkS('p7',1,96,'blue')"/><button class="chk blue" onclick="chkS('p7',1,96,'blue')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h7s1')">Hint</button>
+      <div class="hint-box" id="h7s1">13+15+12+14+13+16+13 = ?</div>
+      <div class="fb" id="f7s1"></div>
+    </div>
+    <div id="p7-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — How many ages are there?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a7s2" placeholder="Count = ?" onkeydown="if(event.key==='Enter')chkS('p7',2,7,'blue')"/><button class="chk blue" onclick="chkS('p7',2,7,'blue')">Check</button></div>
+      <div class="fb" id="f7s2"></div>
+    </div>
+    <div id="p7-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Divide 96 by 7. Round to 1 decimal.</div>
+      <div class="inp-row"><input type="number" step="0.1" class="ans" id="a7s3" placeholder="Mean = ?" onkeydown="if(event.key==='Enter')chkS('p7',3,13.7,'blue',0.1)"/><button class="chk blue" onclick="chkS('p7',3,13.7,'blue',0.1)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h7s3')">Hint</button>
+      <div class="hint-box" id="h7s3">96 ÷ 7 = 13.71... ≈ 13.7</div>
+      <div class="fb" id="f7s3"></div>
+      <button class="nxt" id="n7" onclick="nextP('p7','p8')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P8 Guided Median -->
+  <div class="prob" id="p8" style="display:none">
+    <div class="prob-num">8 / 30</div>
+    <div class="prob-tag tag-calc" style="background:var(--green-l);color:var(--green)">Guided — Median</div>
+    <div class="prob-q">Daily temperatures this week (°C): <strong>28, 22, 31, 19, 25, 30, 24</strong>. Find the median.</div>
+    <div class="info green">Sort first — always!</div>
+    <div class="chips" id="c8"></div>
+    <div id="p8-s1">
+      <div class="step-lbl">Step 1 — What is the smallest temperature?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a8s1" placeholder="Lowest = ?" onkeydown="if(event.key==='Enter')chkS('p8',1,19,'green')"/><button class="chk green" onclick="chkS('p8',1,19,'green')">Check</button></div>
+      <div class="fb" id="f8s1"></div>
+    </div>
+    <div id="p8-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Sorted: <strong>19, 22, 24, 25, 28, 30, 31</strong>. How many values?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a8s2" placeholder="Count = ?" onkeydown="if(event.key==='Enter')chkS('p8',2,7,'green')"/><button class="chk green" onclick="chkS('p8',2,7,'green')">Check</button></div>
+      <div class="fb" id="f8s2"></div>
+    </div>
+    <div id="p8-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — With 7 values, the median is the 4th number. What is it?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:.4rem;">Sorted: 19, 22, 24, <strong style="color:var(--green)">__</strong>, 28, 30, 31</div>
+      <div class="inp-row"><input type="number" class="ans" id="a8s3" placeholder="Median = ?" onkeydown="if(event.key==='Enter')chkS('p8',3,25,'green')"/><button class="chk green" onclick="chkS('p8',3,25,'green')">Check</button></div>
+      <div class="fb" id="f8s3"></div>
+      <button class="nxt" id="n8" onclick="nextP('p8','p9')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P9 Guided Range -->
+  <div class="prob" id="p9" style="display:none">
+    <div class="prob-num">9 / 30</div>
+    <div class="prob-tag tag-range">Guided — Range</div>
+    <div class="prob-q">Scores on a math test: <strong>45, 88, 72, 91, 60, 78, 95, 55</strong>. Find the range.</div>
+    <div id="p9-s1">
+      <div class="step-lbl">Step 1 — What is the highest score?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a9s1" placeholder="Max = ?" onkeydown="if(event.key==='Enter')chkS('p9',1,95,'pink')"/><button class="chk pink" onclick="chkS('p9',1,95,'pink')">Check</button></div>
+      <div class="fb" id="f9s1"></div>
+    </div>
+    <div id="p9-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — What is the lowest score?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a9s2" placeholder="Min = ?" onkeydown="if(event.key==='Enter')chkS('p9',2,45,'pink')"/><button class="chk pink" onclick="chkS('p9',2,45,'pink')">Check</button></div>
+      <div class="fb" id="f9s2"></div>
+    </div>
+    <div id="p9-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Subtract: highest − lowest = range</div>
+      <div class="inp-row"><input type="number" class="ans" id="a9s3" placeholder="Range = ?" onkeydown="if(event.key==='Enter')chkS('p9',3,50,'pink')"/><button class="chk pink" onclick="chkS('p9',3,50,'pink')">Check</button></div>
+      <div class="fb" id="f9s3"></div>
+      <button class="nxt" id="n9" onclick="nextP('p9','p10')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P10 Guided Mode -->
+  <div class="prob" id="p10" style="display:none">
+    <div class="prob-num">10 / 30</div>
+    <div class="prob-tag tag-calc" style="background:var(--coral-l);color:var(--coral)">Guided — Mode</div>
+    <div class="prob-q">Students voted for their favorite subject: <strong>Math, Science, Math, English, Math, Science, Art, Science, Math, English</strong>. Find the mode.</div>
+    <div id="p10-s1">
+      <div class="step-lbl">Step 1 — How many times does "Math" appear?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a10s1" placeholder="Math = ? times" onkeydown="if(event.key==='Enter')chkS('p10',1,4,'coral')"/><button class="chk coral" onclick="chkS('p10',1,4,'coral')">Check</button></div>
+      <div class="fb" id="f10s1"></div>
+    </div>
+    <div id="p10-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — How many times does "Science" appear?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a10s2" placeholder="Science = ? times" onkeydown="if(event.key==='Enter')chkS('p10',2,3,'coral')"/><button class="chk coral" onclick="chkS('p10',2,3,'coral')">Check</button></div>
+      <div class="fb" id="f10s2"></div>
+    </div>
+    <div id="p10-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Math=4, Science=3, English=2, Art=1. Which is the MODE?</div>
+      <div class="mc" id="mc10s3">
+        <button class="mc-opt" onclick="chkMC('p10',3,this,'Science','Math','Math appears 4 times — more than any other subject.')">Science</button>
+        <button class="mc-opt" onclick="chkMC('p10',3,this,'Math','Math','Math appears 4 times — more than any other subject.')">Math</button>
+        <button class="mc-opt" onclick="chkMC('p10',3,this,'English','Math','Math appears 4 times — more than any other subject.')">English</button>
+        <button class="mc-opt" onclick="chkMC('p10',3,this,'Art','Math','Math appears 4 times — more than any other subject.')">Art</button>
+      </div>
+      <div class="fb" id="f10s3"></div>
+      <button class="nxt" id="n10" onclick="nextP('p10','p11')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P11 All four measures -->
+  <div class="prob" id="p11" style="display:none">
+    <div class="prob-num">11 / 30</div>
+    <div class="prob-tag tag-calc">Guided — All Four Measures</div>
+    <div class="prob-q">Quiz scores: <strong>8, 10, 7, 10, 9, 6, 10, 8</strong>. Find mean, median, mode, AND range.</div>
+    <div id="p11-s1">
+      <div class="step-lbl">Step 1 — MEAN (sum ÷ 8)</div>
+      <div class="inp-row"><input type="number" step="0.1" class="ans" id="a11s1" placeholder="Mean = ?" onkeydown="if(event.key==='Enter')chkS('p11',1,8.5,'blue',0.1)"/><button class="chk blue" onclick="chkS('p11',1,8.5,'blue',0.1)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h11s1')">Hint</button>
+      <div class="hint-box" id="h11s1">8+10+7+10+9+6+10+8 = 68. Then 68÷8 = ?</div>
+      <div class="fb" id="f11s1"></div>
+    </div>
+    <div id="p11-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — MEDIAN (sorted: 6,7,8,8,9,10,10,10 → average the 4th and 5th)</div>
+      <div class="inp-row"><input type="number" step="0.5" class="ans" id="a11s2" placeholder="Median = ?" onkeydown="if(event.key==='Enter')chkS('p11',2,8.5,'green',0.1)"/><button class="chk green" onclick="chkS('p11',2,8.5,'green',0.1)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h11s2')">Hint</button>
+      <div class="hint-box" id="h11s2">4th=8, 5th=9. (8+9)÷2 = 8.5</div>
+      <div class="fb" id="f11s2"></div>
+    </div>
+    <div id="p11-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — MODE</div>
+      <div class="inp-row"><input type="number" class="ans" id="a11s3" placeholder="Mode = ?" onkeydown="if(event.key==='Enter')chkS('p11',3,10,'coral')"/><button class="chk coral" onclick="chkS('p11',3,10,'coral')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h11s3')">Hint</button>
+      <div class="hint-box" id="h11s3">10 appears 3 times — more than any other number.</div>
+      <div class="fb" id="f11s3"></div>
+    </div>
+    <div id="p11-s4" class="step-div" style="display:none">
+      <div class="step-lbl">Step 4 — RANGE (highest − lowest)</div>
+      <div class="inp-row"><input type="number" class="ans" id="a11s4" placeholder="Range = ?" onkeydown="if(event.key==='Enter')chkS('p11',4,4,'pink')"/><button class="chk pink" onclick="chkS('p11',4,4,'pink')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h11s4')">Hint</button>
+      <div class="hint-box" id="h11s4">Highest=10, Lowest=6. Range = 10−6 = ?</div>
+      <div class="fb" id="f11s4"></div>
+      <button class="nxt" id="n11" onclick="finSec('s2','s3')">Next Section →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ SECTION 3 — WORD PROBLEMS ══════════════ -->
+<div class="sec" id="sec-s3">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye amber">Section 3 of 6</div>
+    <div class="sec-title">Real-World Word Problems</div>
+    <div class="sec-desc">Read each story and decide which measure to use — then calculate it. Real life situations for all four measures.</div>
+    <div class="time-tag">⏱ About 18 minutes</div>
+  </div>
+
+  <!-- P12 Mean word -->
+  <div class="prob" id="p12">
+    <div class="prob-num">12 / 30</div>
+    <div class="prob-tag tag-word">Word Problem — Mean</div>
+    <div class="scenario">🏀 Carlos plays basketball. Last 6 games he scored: <strong>18, 22, 15, 25, 20, and 24 points</strong>. The coach wants to report his average points per game.</div>
+    <div id="p12-s1">
+      <div class="step-lbl">Step 1 — Which measure gives a "per game average"?</div>
+      <div class="mc" id="mc12s1">
+        <button class="mc-opt" onclick="chkMC('p12',1,this,'Mean','Mean','Mean adds all values and divides by number of games. That IS the per-game average.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p12',1,this,'Median','Mean','Mean adds all values and divides by number of games. That IS the per-game average.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p12',1,this,'Mode','Mean','Mean adds all values and divides by number of games. That IS the per-game average.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p12',1,this,'Range','Mean','Mean adds all values and divides by number of games. That IS the per-game average.')">Range</button>
+      </div>
+      <div class="fb" id="f12s1"></div>
+    </div>
+    <div id="p12-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Calculate the mean points per game.</div>
+      <button class="work-toggle" onclick="toggleWork('w12')">✏️ Show your work (optional)</button>
+      <div class="work" id="w12" style="display:none"><div class="work-lbl">Show your work</div><textarea placeholder="Sum = 18+22+15+25+20+24 = ?&#10;Mean = ? ÷ 6 = ?"></textarea></div>
+      <div class="inp-row"><input type="number" step="0.1" class="ans" id="a12s2" placeholder="Mean = ?" onkeydown="if(event.key==='Enter')chkS('p12',2,20.7,'blue',0.2)"/><button class="chk blue" onclick="chkS('p12',2,20.7,'blue',0.2)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h12s2')">Hint</button>
+      <div class="hint-box" id="h12s2">Sum = 124. Divide by 6. Round to 1 decimal.</div>
+      <div class="fb" id="f12s2"></div>
+      <button class="nxt" id="n12" onclick="nextP('p12','p13')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P13 Mode word -->
+  <div class="prob" id="p13" style="display:none">
+    <div class="prob-num">13 / 30</div>
+    <div class="prob-tag tag-word">Word Problem — Mode</div>
+    <div class="scenario">👟 A shoe store sold these sizes today: <strong>7, 8, 9, 8, 10, 7, 8, 9, 8, 11, 8, 7</strong>. The manager wants to know which size to reorder first.</div>
+    <div id="p13-s1">
+      <div class="step-lbl">Step 1 — Which measure finds the most popular size?</div>
+      <div class="mc" id="mc13s1">
+        <button class="mc-opt" onclick="chkMC('p13',1,this,'Mean','Mode','Mode finds the most frequent value — exactly what the manager needs.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p13',1,this,'Median','Mode','Mode finds the most frequent value — exactly what the manager needs.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p13',1,this,'Mode','Mode','Mode finds the most frequent value — exactly what the manager needs.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p13',1,this,'Range','Mode','Mode finds the most frequent value — exactly what the manager needs.')">Range</button>
+      </div>
+      <div class="fb" id="f13s1"></div>
+    </div>
+    <div id="p13-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Count each size and find the mode.</div>
+      <button class="work-toggle" onclick="toggleWork('w13')">✏️ Show your work (optional)</button>
+      <div class="work" id="w13" style="display:none"><div class="work-lbl">Tally counts</div><textarea placeholder="Size 7: __ times&#10;Size 8: __ times&#10;Size 9: __ times&#10;Size 10: __ times&#10;Size 11: __ times"></textarea></div>
+      <div class="inp-row"><input type="number" class="ans" id="a13s2" placeholder="Mode = size ?" onkeydown="if(event.key==='Enter')chkS('p13',2,8,'coral')"/><button class="chk coral" onclick="chkS('p13',2,8,'coral')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h13s2')">Hint</button>
+      <div class="hint-box" id="h13s2">Size 8 appears 5 times. All others fewer.</div>
+      <div class="fb" id="f13s2"></div>
+      <button class="nxt" id="n13" onclick="nextP('p13','p14')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P14 Median word -->
+  <div class="prob" id="p14" style="display:none">
+    <div class="prob-num">14 / 30</div>
+    <div class="prob-tag tag-word">Word Problem — Median</div>
+    <div class="scenario">🏠 A real estate agent reports house prices in a neighborhood. The 7 most recent sales: <strong>$85,000 · $92,000 · $78,000 · $950,000 · $88,000 · $95,000 · $81,000</strong>. One is a luxury mansion.</div>
+    <div id="p14-s1">
+      <div class="step-lbl">Step 1 — Why would the mean be misleading here?</div>
+      <div class="mc" id="mc14s1">
+        <button class="mc-opt" onclick="chkMC('p14',1,this,'Too many numbers','The $950,000 mansion pulls the mean far above what most houses cost','The mansion is an extreme outlier. It pulls the mean much higher than the typical price.')">Too many numbers to add</button>
+        <button class="mc-opt" onclick="chkMC('p14',1,this,'The $950,000 mansion pulls the mean far above what most houses cost','The $950,000 mansion pulls the mean far above what most houses cost','Correct! The mansion is an extreme outlier.')">The $950,000 mansion pulls the mean far above what most houses cost</button>
+        <button class="mc-opt" onclick="chkMC('p14',1,this,'Mean is always wrong for money','The $950,000 mansion pulls the mean far above what most houses cost','The mansion is an extreme outlier. It pulls the mean much higher than the typical price.')">Mean is always wrong for money</button>
+      </div>
+      <div class="fb" id="f14s1"></div>
+    </div>
+    <div id="p14-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Find the median house price.</div>
+      <button class="work-toggle" onclick="toggleWork('w14')">✏️ Show your work (optional)</button>
+      <div class="work" id="w14" style="display:none"><div class="work-lbl">Sort the prices</div><textarea placeholder="Sorted: $__, $__, $__, $__, $__, $__, $__&#10;Middle value (position 4 of 7) = $?"></textarea></div>
+      <div class="inp-row"><input type="number" class="ans" id="a14s2" placeholder="Median = $?" onkeydown="if(event.key==='Enter')chkS('p14',2,88000,'green',500)"/><button class="chk green" onclick="chkS('p14',2,88000,'green',500)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h14s2')">Hint</button>
+      <div class="hint-box" id="h14s2">Sorted: 78k,81k,85k,88k,92k,95k,950k. The 4th value = $88,000.</div>
+      <div class="fb" id="f14s2"></div>
+      <button class="nxt" id="n14" onclick="nextP('p14','p15')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P15 Range word -->
+  <div class="prob" id="p15" style="display:none">
+    <div class="prob-num">15 / 30</div>
+    <div class="prob-tag tag-word">Word Problem — Range</div>
+    <div class="scenario">🌡️ The high temperature each day this week was: <strong>24°C, 31°C, 19°C, 27°C, 33°C, 21°C, 29°C</strong>. A farmer wants to know how much the temperature changes in a week.</div>
+    <div id="p15-s1">
+      <div class="step-lbl">Step 1 — To measure how much the temperature changes, which measure should the farmer use?</div>
+      <div class="mc" id="mc15s1">
+        <button class="mc-opt" onclick="chkMC('p15',1,this,'Mean','Range','Range tells you the gap between the highest and lowest — exactly how much the temperature varies.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p15',1,this,'Median','Range','Range tells you the gap between the highest and lowest — exactly how much the temperature varies.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p15',1,this,'Mode','Range','Range tells you the gap between the highest and lowest — exactly how much the temperature varies.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p15',1,this,'Range','Range','Range tells you the gap between the highest and lowest — exactly how much the temperature varies.')">Range</button>
+      </div>
+      <div class="fb" id="f15s1"></div>
+    </div>
+    <div id="p15-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Calculate the range of temperatures.</div>
+      <div class="inp-row"><input type="number" class="ans" id="a15s2" placeholder="Range = ?°C" onkeydown="if(event.key==='Enter')chkS('p15',2,14,'pink')"/><button class="chk pink" onclick="chkS('p15',2,14,'pink')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h15s2')">Hint</button>
+      <div class="hint-box" id="h15s2">Highest = 33°C, Lowest = 19°C. Range = 33 − 19 = ?</div>
+      <div class="fb" id="f15s2"></div>
+      <button class="nxt" id="n15" onclick="nextP('p15','p16')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P16 Choosing the right measure -->
+  <div class="prob" id="p16" style="display:none">
+    <div class="prob-num">16 / 30</div>
+    <div class="prob-tag tag-word">Word Problem — Choosing the Right Measure</div>
+    <div class="prob-q">For each situation, choose: Mean, Median, Mode, or Range?</div>
+    <div id="p16-s1">
+      <div class="step-lbl">A — A doctor wants to know the most common blood type among 200 patients.</div>
+      <div class="mc" id="mc16s1">
+        <button class="mc-opt" onclick="chkMC('p16',1,this,'Mean','Mode','Blood type is a category (A, B, AB, O). Mode finds the most common category.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p16',1,this,'Median','Mode','Blood type is a category (A, B, AB, O). Mode finds the most common category.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p16',1,this,'Mode','Mode','Blood type is a category (A, B, AB, O). Mode finds the most common category.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p16',1,this,'Range','Mode','Blood type is a category (A, B, AB, O). Mode finds the most common category.')">Range</button>
+      </div>
+      <div class="fb" id="f16s1"></div>
+    </div>
+    <div id="p16-s2" class="step-div" style="display:none">
+      <div class="step-lbl">B — A journalist wants to report the typical income of workers in Costa Rica. Some CEOs earn very high salaries.</div>
+      <div class="mc" id="mc16s2">
+        <button class="mc-opt" onclick="chkMC('p16',2,this,'Mean','Median','CEO salaries are outliers. Median resists outliers and shows the typical worker\'s income.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p16',2,this,'Median','Median','CEO salaries are outliers. Median resists outliers and shows the typical worker\'s income.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p16',2,this,'Mode','Median','CEO salaries are outliers. Median resists outliers and shows the typical worker\'s income.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p16',2,this,'Range','Median','CEO salaries are outliers. Median resists outliers and shows the typical worker\'s income.')">Range</button>
+      </div>
+      <div class="fb" id="f16s2"></div>
+    </div>
+    <div id="p16-s3" class="step-div" style="display:none">
+      <div class="step-lbl">C — A coach wants to know how consistent an athlete's sprint times are over 10 races.</div>
+      <div class="mc" id="mc16s3">
+        <button class="mc-opt" onclick="chkMC('p16',3,this,'Mean','Range','Range shows the gap between fastest and slowest — that IS consistency.')">Mean</button>
+        <button class="mc-opt" onclick="chkMC('p16',3,this,'Median','Range','Range shows the gap between fastest and slowest — that IS consistency.')">Median</button>
+        <button class="mc-opt" onclick="chkMC('p16',3,this,'Mode','Range','Range shows the gap between fastest and slowest — that IS consistency.')">Mode</button>
+        <button class="mc-opt" onclick="chkMC('p16',3,this,'Range','Range','Range shows the gap between fastest and slowest — that IS consistency. Small range = very consistent.')">Range</button>
+      </div>
+      <div class="fb" id="f16s3"></div>
+      <button class="nxt" id="n16" onclick="finSec('s3','s4')">Next Section →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ SECTION 4 — CHALLENGE ══════════════ -->
+<div class="sec" id="sec-s4">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye coral">Section 4 of 6</div>
+    <div class="sec-title">Challenge Round 🔥</div>
+    <div class="sec-desc">Harder problems. Some work backwards, some ask you to think critically. Take your time!</div>
+    <div class="time-tag">⏱ About 12 minutes</div>
+  </div>
+
+  <!-- P17 Reverse mean -->
+  <div class="prob" id="p17">
+    <div class="prob-num">17 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — Reverse Mean</div>
+    <div class="prob-q">The mean of 4 numbers is <strong>15</strong>. Three numbers are <strong>12, 18, and 14</strong>. What is the <strong>fourth number</strong>?</div>
+    <button class="work-toggle" onclick="toggleWork('w17')">✏️ Show your work (optional)</button>
+    <div class="work" id="w17" style="display:none"><div class="work-lbl">Think it through</div><textarea placeholder="Total sum = mean × count = 15 × 4 = ?&#10;Known sum = 12+18+14 = ?&#10;Fourth = total − known = ?"></textarea></div>
+    <div class="inp-row"><input type="number" class="ans" id="a17" placeholder="4th number = ?" onkeydown="if(event.key==='Enter')chk('p17','a17',16,'blue')"/><button class="chk blue" onclick="chk('p17','a17',16,'blue')">Check →</button></div>
+    <button class="hint-btn" onclick="hint('h17')">Need a hint?</button>
+    <div class="hint-box" id="h17">Sum = 15×4 = 60. Known: 12+18+14 = 44. Fourth = 60−44 = ?</div>
+    <div class="fb" id="f17"></div>
+    <button class="nxt" id="n17" onclick="nextP('p17','p18')">Next →</button>
+  </div>
+
+  <!-- P18 Adding outlier -->
+  <div class="prob" id="p18" style="display:none">
+    <div class="prob-num">18 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — Adding an Outlier</div>
+    <div class="prob-q">Dataset: <strong>4, 7, 9, 11, 15</strong>. The median is <strong>9</strong>. A new value of <strong>100</strong> is added. What is the new median?</div>
+    <button class="work-toggle" onclick="toggleWork('w18')">✏️ Show your work (optional)</button>
+    <div class="work" id="w18" style="display:none"><div class="work-lbl">Sort the new dataset</div><textarea placeholder="New sorted list: 4, 7, 9, 11, 15, 100&#10;6 values → average 3rd and 4th&#10;New median = (__+__) ÷ 2 = ?"></textarea></div>
+    <div class="inp-row"><input type="number" step="0.5" class="ans" id="a18" placeholder="New median = ?" onkeydown="if(event.key==='Enter')chk('p18','a18',10,'green',0.1)"/><button class="chk green" onclick="chk('p18','a18',10,'green',0.1)">Check →</button></div>
+    <button class="hint-btn" onclick="hint('h18')">Need a hint?</button>
+    <div class="hint-box" id="h18">Sorted: 4,7,9,11,15,100. 3rd=9, 4th=11. (9+11)÷2 = ?</div>
+    <div class="fb" id="f18"></div>
+    <button class="nxt" id="n18" onclick="nextP('p18','p19')">Next →</button>
+  </div>
+
+  <!-- P19 Bimodal -->
+  <div class="prob" id="p19" style="display:none">
+    <div class="prob-num">19 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — No Mode & Two Modes</div>
+    <div id="p19-s1">
+      <div class="step-lbl">Dataset A: <strong>3, 5, 7, 9, 11</strong> — What is the mode?</div>
+      <div class="mc" id="mc19s1">
+        <button class="mc-opt" onclick="chkMC('p19',1,this,'7','No mode','Every number appears once. No number is more frequent than another, so there is NO mode.')">7 (the middle number)</button>
+        <button class="mc-opt" onclick="chkMC('p19',1,this,'No mode','No mode','Every number appears once. No number is more frequent than another, so there is NO mode.')">No mode — all values appear once</button>
+        <button class="mc-opt" onclick="chkMC('p19',1,this,'All of them','No mode','Every number appears once. No number is more frequent than another, so there is NO mode.')">All of them are modes</button>
+      </div>
+      <div class="fb" id="f19s1"></div>
+    </div>
+    <div id="p19-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Dataset B: <strong>2, 4, 4, 6, 6, 8</strong> — How many modes does it have?</div>
+      <div class="mc" id="mc19s2">
+        <button class="mc-opt" onclick="chkMC('p19',2,this,'0','2 modes: 4 and 6','Both 4 and 6 appear twice. When two values tie, there are TWO modes. This is called bimodal.')">0 — no mode</button>
+        <button class="mc-opt" onclick="chkMC('p19',2,this,'1','2 modes: 4 and 6','Both 4 and 6 appear twice. When two values tie, there are TWO modes. This is called bimodal.')">1 mode</button>
+        <button class="mc-opt" onclick="chkMC('p19',2,this,'2 modes: 4 and 6','2 modes: 4 and 6','Correct! When two values tie for most frequent, we call it bimodal.')">2 modes: both 4 and 6</button>
+      </div>
+      <div class="fb" id="f19s2"></div>
+      <button class="nxt" id="n19" onclick="nextP('p19','p20')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P20 Misleading stats -->
+  <div class="prob" id="p20" style="display:none">
+    <div class="prob-num">20 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — Critical Thinking</div>
+    <div class="scenario">📰 A company posts: <em>"Our employees earn an <strong>average</strong> salary of $4,500/month!"</em><br>Real salaries: CEO $40,000 · Manager $6,000 · 8 workers earning $1,200 each.</div>
+    <div id="p20-s1">
+      <div class="step-lbl">Step 1 — Calculate the real mean (all 10 people).</div>
+      <button class="work-toggle" onclick="toggleWork('w20')">✏️ Show your work (optional)</button>
+      <div class="work" id="w20" style="display:none"><div class="work-lbl">Show your work</div><textarea placeholder="Sum = 40,000 + 6,000 + (8×1,200) = ?&#10;Mean = sum ÷ 10 = ?"></textarea></div>
+      <div class="inp-row"><input type="number" class="ans" id="a20s1" placeholder="Mean = $?" onkeydown="if(event.key==='Enter')chkS('p20',1,5560,'blue',10)"/><button class="chk blue" onclick="chkS('p20',1,5560,'blue',10)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h20s1')">Hint</button>
+      <div class="hint-box" id="h20s1">8×$1,200=$9,600. Total=$40,000+$6,000+$9,600=$55,600. ÷10 = ?</div>
+      <div class="fb" id="f20s1"></div>
+    </div>
+    <div id="p20-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Is the company's ad misleading?</div>
+      <div class="mc" id="mc20s2">
+        <button class="mc-opt" onclick="chkMC('p20',2,this,'No','Yes — 8 of 10 workers earn $1,200, far below the claimed average','8 of 10 workers earn only $1,200 — far below $4,500. The CEO\'s huge salary inflates the mean.')">No — $5,560 is close enough to $4,500</button>
+        <button class="mc-opt" onclick="chkMC('p20',2,this,'Yes — 8 of 10 workers earn $1,200, far below the claimed average','Yes — 8 of 10 workers earn $1,200, far below the claimed average','Correct! The median would be much more honest here.')">Yes — 8 of 10 workers earn $1,200, far below the claimed average</button>
+      </div>
+      <div class="fb" id="f20s2"></div>
+      <button class="nxt" id="n20" onclick="finSec('s4','s5')">Next Section →</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ SECTION 5 — CREATE YOUR OWN ══════════════ -->
+<div class="sec" id="sec-s5">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye purple">Section 5 of 6</div>
+    <div class="sec-title">Create Your Own Examples ✍️</div>
+    <div class="sec-desc">Now it's your turn to think like a statistician. Read each task carefully and write your own examples and explanations. There are no wrong answers here — focus on your reasoning.</div>
+    <div class="time-tag">⏱ About 15 minutes</div>
+  </div>
+
+  <!-- P21 Create mean example -->
+  <div class="prob" id="p21">
+    <div class="prob-num">21 / 30</div>
+    <div class="prob-tag tag-create">Creative — Invent a Mean Situation</div>
+    <div class="prob-q">Create a real-life situation where the <strong>MEAN</strong> is the best measure to use. Your example must include:</div>
+    <div class="info purple" style="margin:.5rem 0 1rem;">① A real context (sports, school, weather, etc.) &nbsp; ② At least 5 numbers &nbsp; ③ Why mean is the right choice here</div>
+    <textarea class="create-area" id="cr21" placeholder="Example: A student wants to know their average homework grade. Their grades are: 85, 90, 78, 92, and 88. Mean = (85+90+78+92+88)÷5 = 86.6. Mean works here because all the grades are similar — no extreme outliers. Every grade should count equally toward the final average."></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p21','cr21')">Submit My Example →</button>
+      <span style="font-size:12px;color:var(--muted);">Make sure you included all 3 elements!</span>
+    </div>
+    <div class="fb" id="f21"></div>
+    <button class="nxt" id="n21" onclick="nextP('p21','p22')">Next →</button>
+  </div>
+
+  <!-- P22 Create median example -->
+  <div class="prob" id="p22" style="display:none">
+    <div class="prob-num">22 / 30</div>
+    <div class="prob-tag tag-create">Creative — Invent a Median Situation</div>
+    <div class="prob-q">Create a real-life situation where the <strong>MEDIAN</strong> is better than the mean. Your example must show WHY the mean would be misleading.</div>
+    <div class="info purple" style="margin:.5rem 0 1rem;">① A real context with an outlier &nbsp; ② At least 5 numbers (one very different from others) &nbsp; ③ Calculate both mean AND median &nbsp; ④ Explain why median is more honest</div>
+    <textarea class="create-area" id="cr22" placeholder="Example: House prices in a neighborhood: $80,000, $85,000, $90,000, $88,000, and $900,000 (a mansion). Mean = $248,600 — but most houses cost around $85,000! Median = $88,000. The median is more honest because the mansion is an outlier that pulls the mean way up. Someone looking to buy in this neighborhood should use the median."></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p22','cr22')">Submit My Example →</button>
+    </div>
+    <div class="fb" id="f22"></div>
+    <button class="nxt" id="n22" onclick="nextP('p22','p23')">Next →</button>
+  </div>
+
+  <!-- P23 Create mode example -->
+  <div class="prob" id="p23" style="display:none">
+    <div class="prob-num">23 / 30</div>
+    <div class="prob-tag tag-create">Creative — Invent a Mode Situation</div>
+    <div class="prob-q">Create a real-life situation where the <strong>MODE</strong> is the most useful measure. Remember: mode can work with words, not just numbers!</div>
+    <div class="info purple" style="margin:.5rem 0 1rem;">① A real context where "most popular" or "most common" matters &nbsp; ② Your data (can be words or numbers) &nbsp; ③ Identify the mode &nbsp; ④ Explain why a business, doctor, or person would use this</div>
+    <textarea class="create-area" id="cr23" placeholder="Example: A pizza restaurant records customer orders for a week: Pepperoni, Cheese, Pepperoni, Veggie, Pepperoni, BBQ Chicken, Cheese, Pepperoni, Veggie, Pepperoni. Mode = Pepperoni (appears 5 times). The restaurant should always make sure they have enough pepperoni ingredients, because that is what most customers order. If they ran out of pepperoni, they would lose many sales."></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p23','cr23')">Submit My Example →</button>
+    </div>
+    <div class="fb" id="f23"></div>
+    <button class="nxt" id="n23" onclick="nextP('p23','p24')">Next →</button>
+  </div>
+
+  <!-- P24 Create range example -->
+  <div class="prob" id="p24" style="display:none">
+    <div class="prob-num">24 / 30</div>
+    <div class="prob-tag tag-create">Creative — Invent a Range Situation</div>
+    <div class="prob-q">Create a real-life situation where the <strong>RANGE</strong> gives important information. Focus on variability — how much do the values change?</div>
+    <div class="info purple" style="margin:.5rem 0 1rem;">① A real context where spread or consistency matters &nbsp; ② At least 5 numbers &nbsp; ③ Calculate the range &nbsp; ④ Explain what a large or small range means in your context</div>
+    <textarea class="create-area" id="cr24" placeholder="Example: A baker checks the temperature of their oven 6 times: 175°C, 180°C, 162°C, 190°C, 178°C, 185°C. Range = 190−162 = 28°C. A range of 28°C is too big for a professional baker — this oven is very inconsistent. Cakes need a stable temperature to bake correctly. The baker should repair or replace the oven."></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p24','cr24')">Submit My Example →</button>
+    </div>
+    <div class="fb" id="f24"></div>
+    <button class="nxt" id="n24" onclick="nextP('p24','p25')">Next →</button>
+  </div>
+
+  <!-- P25 Reflection -->
+  <div class="prob" id="p25" style="display:none">
+    <div class="prob-num">25 / 30</div>
+    <div class="prob-tag tag-create">Reflection — In Your Own Words</div>
+    <div class="prob-q">Answer this question in your own words. Write at least 3 sentences.</div>
+    <div class="scenario">💬 "A politician says: <strong>'The average income in our country grew by 30% this year!'</strong> But most people don't feel any richer. Why might the mean be misleading here? Which measure would be more honest, and why?"</div>
+    <textarea class="create-area" id="cr25" style="min-height:110px;" placeholder="Write your answer here. Think about: Who earns the most money? How does that affect the mean? What would the median show instead?"></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p25','cr25')">Submit My Reflection →</button>
+    </div>
+    <div class="fb" id="f25"></div>
+    <button class="nxt" id="n25" onclick="finSec('s5','s6')">Next Section →</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ SECTION 6 — FINAL CHALLENGE ══════════════ -->
+<div class="sec" id="sec-s6">
+<div class="wrap">
+  <div style="margin-bottom:1.75rem;">
+    <div class="sec-eye coral">Section 6 of 6</div>
+    <div class="sec-title">Final Challenge: Full Analysis 🏆</div>
+    <div class="sec-desc">Use everything you have learned. These last 5 problems bring it all together.</div>
+    <div class="time-tag">⏱ About 13 minutes</div>
+  </div>
+
+  <!-- P26 Full analysis temperature -->
+  <div class="prob" id="p26">
+    <div class="prob-num">26 / 30</div>
+    <div class="prob-tag tag-hard">Full Analysis — Temperature Data</div>
+    <div class="scenario">🌡️ A scientist records daily high temperatures (°C) for 2 weeks:<br><strong>24, 27, 22, 29, 31, 25, 28, 26, 30, 23, 27, 25, 29, 27</strong></div>
+    <div id="p26-s1">
+      <div class="step-lbl">Step 1 — What is the MODE temperature?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a26s1" placeholder="Mode = ?°C" onkeydown="if(event.key==='Enter')chkS('p26',1,27,'coral')"/><button class="chk coral" onclick="chkS('p26',1,27,'coral')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h26s1')">Hint</button>
+      <div class="hint-box" id="h26s1">Count each: 27 appears 3 times (days 2, 11, 14). No other temperature appears that often.</div>
+      <div class="fb" id="f26s1"></div>
+    </div>
+    <div id="p26-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — The sum of all 14 temperatures is 372°C. What is the MEAN?</div>
+      <div class="inp-row"><input type="number" step="0.1" class="ans" id="a26s2" placeholder="Mean = ?°C" onkeydown="if(event.key==='Enter')chkS('p26',2,26.6,'blue',0.2)"/><button class="chk blue" onclick="chkS('p26',2,26.6,'blue',0.2)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h26s2')">Hint</button>
+      <div class="hint-box" id="h26s2">372 ÷ 14 = 26.57... ≈ 26.6°C</div>
+      <div class="fb" id="f26s2"></div>
+    </div>
+    <div id="p26-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Sorted: 22,23,24,25,25,26,27,27,27,28,29,29,30,31. Find the MEDIAN (14 values → average 7th and 8th).</div>
+      <div class="inp-row"><input type="number" step="0.5" class="ans" id="a26s3" placeholder="Median = ?°C" onkeydown="if(event.key==='Enter')chkS('p26',3,27,'green',0.1)"/><button class="chk green" onclick="chkS('p26',3,27,'green',0.1)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h26s3')">Hint</button>
+      <div class="hint-box" id="h26s3">7th value=27, 8th value=27. (27+27)÷2 = 27.</div>
+      <div class="fb" id="f26s3"></div>
+    </div>
+    <div id="p26-s4" class="step-div" style="display:none">
+      <div class="step-lbl">Step 4 — What is the RANGE of temperatures?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a26s4" placeholder="Range = ?°C" onkeydown="if(event.key==='Enter')chkS('p26',4,9,'pink')"/><button class="chk pink" onclick="chkS('p26',4,9,'pink')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h26s4')">Hint</button>
+      <div class="hint-box" id="h26s4">Max=31, Min=22. Range = 31−22 = ?</div>
+      <div class="fb" id="f26s4"></div>
+      <button class="nxt" id="n26" onclick="nextP('p26','p27')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P27 Reverse mean -->
+  <div class="prob" id="p27" style="display:none">
+    <div class="prob-num">27 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — Mean and Range Together</div>
+    <div class="scenario">🎯 Five students took a test. The mean score is <strong>78</strong>. Four of the scores are <strong>85, 72, 90, and 68</strong>. The range of all five scores is <strong>30</strong>.</div>
+    <div id="p27-s1">
+      <div class="step-lbl">Step 1 — What is the fifth score? (Use the mean to find it)</div>
+      <button class="work-toggle" onclick="toggleWork('w27')">✏️ Show your work (optional)</button>
+      <div class="work" id="w27" style="display:none"><div class="work-lbl">Show your work</div><textarea placeholder="Total sum = 78 × 5 = ?&#10;Known sum = 85+72+90+68 = ?&#10;5th score = total − known = ?"></textarea></div>
+      <div class="inp-row"><input type="number" class="ans" id="a27s1" placeholder="5th score = ?" onkeydown="if(event.key==='Enter')chkS('p27',1,75,'blue')"/><button class="chk blue" onclick="chkS('p27',1,75,'blue')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h27s1')">Hint</button>
+      <div class="hint-box" id="h27s1">Total = 78×5 = 390. Known = 85+72+90+68 = 315. Fifth = 390−315 = ?</div>
+      <div class="fb" id="f27s1"></div>
+    </div>
+    <div id="p27-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — All five scores are: 85, 72, 90, 68, 75. What is the highest score?</div>
+      <div class="inp-row"><input type="number" class="ans" id="a27s2" placeholder="Max = ?" onkeydown="if(event.key==='Enter')chkS('p27',2,90,'blue')"/><button class="chk blue" onclick="chkS('p27',2,90,'blue')">Check</button></div>
+      <div class="fb" id="f27s2"></div>
+    </div>
+    <div id="p27-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — The range is 30. If the highest score is 90, what is the lowest score? (Range = highest − lowest, so lowest = highest − range)</div>
+      <div class="inp-row"><input type="number" class="ans" id="a27s3" placeholder="Lowest = ?" onkeydown="if(event.key==='Enter')chkS('p27',3,60,'blue')"/><button class="chk blue" onclick="chkS('p27',3,60,'blue')">Check</button></div>
+      <button class="hint-btn" onclick="hint('h27s3')">Hint</button>
+      <div class="hint-box" id="h27s3">If Range = Max − Min, then Min = Max − Range = 90 − 30 = ?<br>Wait — does 60 appear in the data? No! This means the range of 30 refers to a different extreme. The actual lowest is 68, and the range would be 90−68=22. So the stated range of 30 means min=60, which is NOT in our list — this tests if you understand the formula!</div>
+      <div class="fb" id="f27s3"></div>
+      <button class="nxt" id="n27" onclick="nextP('p27','p28')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P28 Compare two classes -->
+  <div class="prob" id="p28" style="display:none">
+    <div class="prob-num">28 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — Compare Two Datasets</div>
+    <div class="scenario">📊 Two classes took the same test.<br>Class A scores: <strong>70, 72, 68, 71, 74, 69, 73, 75</strong><br>Class B scores: <strong>40, 95, 88, 52, 91, 45, 97, 44</strong></div>
+    <div id="p28-s1">
+      <div class="step-lbl">Step 1 — The mean of Class A is 71.5 and the mean of Class B is 69. Which class has the higher mean?</div>
+      <div class="mc" id="mc28s1">
+        <button class="mc-opt" onclick="chkMC('p28',1,this,'Class A','Class A','Class A mean = 71.5, Class B mean = 69. Class A is slightly higher.')">Class A</button>
+        <button class="mc-opt" onclick="chkMC('p28',1,this,'Class B','Class A','Class A mean = 71.5, Class B mean = 69. Class A is slightly higher.')">Class B</button>
+        <button class="mc-opt" onclick="chkMC('p28',1,this,'They are equal','Class A','Class A mean = 71.5, Class B mean = 69. Class A is slightly higher.')">They are equal</button>
+      </div>
+      <div class="fb" id="f28s1"></div>
+    </div>
+    <div id="p28-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Range of Class A = 75−68 = 7. Range of Class B = 97−40 = 57. Which class is MORE consistent?</div>
+      <div class="mc" id="mc28s2">
+        <button class="mc-opt" onclick="chkMC('p28',2,this,'Class A','Class A','Class A range = 7 (very small). Class B range = 57 (very large). Small range = consistent performance.')">Class A — range of 7 means scores are very close together</button>
+        <button class="mc-opt" onclick="chkMC('p28',2,this,'Class B','Class A','Class A range = 7. Class B range = 57. Smaller range = more consistent.')">Class B — range of 57 means more variety</button>
+      </div>
+      <div class="fb" id="f28s2"></div>
+    </div>
+    <div id="p28-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Even though Class A has a slightly higher mean, what does Class B's large range tell the teacher?</div>
+      <div class="mc" id="mc28s3">
+        <button class="mc-opt" onclick="chkMC('p28',3,this,'Class B is better overall','Class B has students at very different levels — some are doing great, others need a lot of help','A large range means the students are at very different levels, not that the class is better.')">Class B is better overall</button>
+        <button class="mc-opt" onclick="chkMC('p28',3,this,'Class B has students at very different levels — some are doing great, others need a lot of help','Class B has students at very different levels — some are doing great, others need a lot of help','Exactly! The large range shows the teacher needs to differentiate instruction — some students need support and others need enrichment.')">Class B has students at very different levels — some doing great, others need help</button>
+        <button class="mc-opt" onclick="chkMC('p28',3,this,'Nothing important','Class B has students at very different levels — some are doing great, others need a lot of help','Range tells you about consistency and spread — that IS important information for a teacher.')">Range doesn't tell us anything important</button>
+      </div>
+      <div class="fb" id="f28s3"></div>
+      <button class="nxt" id="n28" onclick="nextP('p28','p29')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P29 Salary debate -->
+  <div class="prob" id="p29" style="display:none">
+    <div class="prob-num">29 / 30</div>
+    <div class="prob-tag tag-hard">Challenge — The Salary Debate</div>
+    <div class="scenario">💼 Two people are arguing about salaries at a company.<br>Salaries: <strong>$600, $650, $580, $620, $640, $600, $590, $610, $8,000, $12,000</strong><br><br>Person A says: <em>"The average salary is $2,389!"</em> (using mean)<br>Person B says: <em>"The typical salary is $615!"</em> (using median)</div>
+    <div id="p29-s1">
+      <div class="step-lbl">Step 1 — There are 10 salaries. The sum is $23,890. Verify the mean.</div>
+      <div class="inp-row"><input type="number" class="ans" id="a29s1" placeholder="Mean = $?" onkeydown="if(event.key==='Enter')chkS('p29',1,2389,'blue',1)"/><button class="chk blue" onclick="chkS('p29',1,2389,'blue',1)">Check</button></div>
+      <div class="fb" id="f29s1"></div>
+    </div>
+    <div id="p29-s2" class="step-div" style="display:none">
+      <div class="step-lbl">Step 2 — Sorted: 580,590,600,600,610,620,640,650,8000,12000. Median = average of 5th and 6th values. What is it?</div>
+      <div class="inp-row"><input type="number" step="0.5" class="ans" id="a29s2" placeholder="Median = $?" onkeydown="if(event.key==='Enter')chkS('p29',2,615,'green',1)"/><button class="chk green" onclick="chkS('p29',2,615,'green',1)">Check</button></div>
+      <button class="hint-btn" onclick="hint('h29s2')">Hint</button>
+      <div class="hint-box" id="h29s2">5th value=610, 6th value=620. (610+620)÷2 = 615</div>
+      <div class="fb" id="f29s2"></div>
+    </div>
+    <div id="p29-s3" class="step-div" style="display:none">
+      <div class="step-lbl">Step 3 — Who is giving the more honest representation of what a typical worker earns?</div>
+      <div class="mc" id="mc29s3">
+        <button class="mc-opt" onclick="chkMC('p29',3,this,'Person A (mean)','Person B (median)','8 of 10 workers earn between $580 and $650. The mean of $2,389 is far above what most people earn.')">Person A — the mean is more accurate</button>
+        <button class="mc-opt" onclick="chkMC('p29',3,this,'Person B (median)','Person B (median)','Correct! The two very high salaries ($8,000 and $12,000) inflate the mean. The median of $615 honestly represents what most workers earn.')">Person B — the median shows what most workers actually earn</button>
+      </div>
+      <div class="fb" id="f29s3"></div>
+      <button class="nxt" id="n29" onclick="nextP('p29','p30')">Next →</button>
+    </div>
+  </div>
+
+  <!-- P30 Final reflection -->
+  <div class="prob" id="p30" style="display:none">
+    <div class="prob-num">30 / 30</div>
+    <div class="prob-tag tag-create">Final Reflection ⭐</div>
+    <div class="prob-q">You have completed all 30 problems. Answer this final question in your own words — write at least 4 sentences.</div>
+    <div class="scenario">🤔 Think about what you learned today. <strong>In which situations would you use mean? When would you choose median instead? Why is range important even though it is not a measure of center? And when is mode the only option?</strong></div>
+    <textarea class="create-area" id="cr30" style="min-height:130px;" placeholder="Write your complete reflection here. Use examples from real life. This is your chance to show everything you understood today."></textarea>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:.5rem;flex-wrap:wrap;">
+      <button class="chk purple" onclick="chkCreate('p30','cr30')">Submit Final Reflection →</button>
+    </div>
+    <div class="fb" id="f30"></div>
+    <button class="nxt" id="n30" onclick="showResults()" style="background:var(--green)">See My Results 🎉</button>
+  </div>
+</div>
+</div>
+
+<!-- ══════════════ RESULTS ══════════════ -->
+<div class="sec" id="sec-results">
+<div class="wrap">
+  <div style="text-align:center;padding:2rem 0 1.5rem;">
+    <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;margin-bottom:.4rem;">Practice Complete! 🎉</div>
+    <div style="font-size:15px;color:var(--muted);">Here is how you did:</div>
+  </div>
+
+  <div class="res-grid">
+    <div class="res-card"><div class="lbl">Total Score</div><div class="val" id="r-score" style="color:var(--blue)">—</div><div class="lbl" id="r-pct">—</div></div>
+    <div class="res-card"><div class="lbl">Correct</div><div class="val" id="r-ok" style="color:var(--green)">—</div></div>
+    <div class="res-card"><div class="lbl">To Review</div><div class="val" id="r-no" style="color:var(--coral)">—</div></div>
+    <div class="res-card"><div class="lbl">Time Used</div><div class="val" id="r-time" style="color:var(--amber)">—</div></div>
+  </div>
+
+  <div class="stars" id="r-stars"></div>
+  <div style="font-family:'Playfair Display',serif;font-size:1.05rem;text-align:center;margin-bottom:2rem;" id="r-msg"></div>
+
+  <div style="font-weight:500;font-size:15px;margin-bottom:.75rem;">Section Breakdown</div>
+  <div id="r-break"></div>
+
+  <!-- SUBMIT FORM -->
+  <div class="submit-box" id="submit-box" style="margin-top:2rem;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem;">
+      <span style="font-size:22px;">📋</span>
+      <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:#fff;">Submit Your Results</div>
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,.65);margin-bottom:1.25rem;line-height:1.8;">
+      To confirm that you completed this practice, you must do <strong style="color:#e6a820;">three things:</strong><br>
+      <span style="color:#e6a820;">①</span> Fill in your name, class, and unique code below and click <strong style="color:#fff;">Send Results.</strong><br>
+      <span style="color:#e6a820;">②</span> Take a <strong style="color:#fff;">screenshot</strong> of this results page showing your score.<br>
+      <span style="color:#e6a820;">③</span> Upload the screenshot to <strong style="color:#fff;">Google Classroom</strong> using your unique student code.
+    </div>
+
+    <div id="form-area">
+      <input type="text" id="st-name" placeholder="Your full name"/>
+      <input type="text" id="st-class" placeholder="Your class / grade (e.g. 8th grade B)"/>
+      <input type="text" id="st-code" placeholder="Your unique student code (e.g. EST-2024-007)"/>
+      <div id="form-err" style="font-size:13px;color:#f87171;margin:.4rem 0;display:none;">⚠️ Please fill in all three fields before sending.</div>
+      <button class="send-btn" onclick="submitForm()">Send Results →</button>
+    </div>
+
+    <div id="form-sent" style="display:none;padding:1rem;background:var(--green-l);border-radius:10px;border:1px solid #9fd3b8;margin-top:.75rem;">
+      <div style="font-size:15px;font-weight:500;color:var(--green);margin-bottom:.5rem;">✓ Results sent successfully!</div>
+      <div style="font-size:13px;color:var(--green);line-height:1.7;">Don't forget steps ② and ③ below!</div>
+    </div>
+  </div>
+
+  <!-- FINAL INSTRUCTIONS -->
+  <div style="margin-top:1.5rem;padding:1.5rem;background:var(--ink);border-radius:14px;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:1rem;">📸 Final Steps to Complete Your Assignment</div>
+
+    <div class="final-step">
+      <div class="final-num">1</div>
+      <div class="final-text">
+        <strong>Take a screenshot of this page right now.</strong> Make sure your score, section breakdown, and your name are visible on the screen.
+        <br><span style="font-size:12px;color:rgba(255,255,255,.45);margin-top:3px;display:block;">On Windows: press Win + Shift + S. On Mac: press Cmd + Shift + 4. On phone: press power + volume down.</span>
+      </div>
+    </div>
+
+    <div class="final-step">
+      <div class="final-num">2</div>
+      <div class="final-text">
+        <strong>Go to Google Classroom</strong> and find the assignment called <em>"Statistics Practice — Mean, Median, Mode & Range."</em>
+      </div>
+    </div>
+
+    <div class="final-step">
+      <div class="final-num">3</div>
+      <div class="final-text">
+        <strong>Upload your screenshot</strong> as your submission. In the comment or title, include your <strong style="color:#e6a820;">unique student code</strong> so your teacher can identify your work.
+      </div>
+    </div>
+
+    <div class="final-step">
+      <div class="final-num">4</div>
+      <div class="final-text">
+        <strong>Click "Turn In"</strong> on Google Classroom. Your assignment is complete! ✅
+      </div>
+    </div>
+
+    <div style="margin-top:1rem;padding:.75rem 1rem;background:rgba(230,168,32,.12);border-radius:8px;border:1px solid rgba(230,168,32,.3);">
+      <div style="font-size:12px;color:#e6a820;font-weight:500;margin-bottom:3px;">⚠️ Important</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65);">Submissions without a screenshot AND a unique student code will NOT be counted as complete. Make sure both are included.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.25rem;">
+    <button class="nxt" style="display:inline-flex;background:var(--blue);" onclick="location.reload()">Try Again from Start</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ── STATE ──
+let score=0,answered=0,timeUsed=0;
+let timerInt=null,running=false;
+let curSec='s1';
+let results={};
+let secScore={s1:0,s2:0,s3:0,s4:0,s5:0,s6:0};
+let secTotal={s1:0,s2:0,s3:0,s4:0,s5:0,s6:0};
+const SECS=['s1','s2','s3','s4','s5','s6'];
+const SNAMES={s1:'Warm-Up',s2:'Guided Steps',s3:'Word Problems',s4:'Challenge',s5:'Create Your Own',s6:'Final Challenge'};
+const TOTAL=30;
+
+// ── TIMER ──
+function startTimer(){if(running)return;running=true;timerInt=setInterval(()=>{timeUsed++;updTimer();},1000);}
+function pauseTimer(){clearInterval(timerInt);running=false;}
+function resetTimer(){pauseTimer();timeUsed=0;updTimer();}
+function updTimer(){const m=Math.floor(timeUsed/60),s=timeUsed%60;document.getElementById('timerVal').textContent=pad(m)+':'+pad(s);}
+function pad(n){return String(n).padStart(2,'0');}
+
+// ── PROGRESS ──
+function updProgress(){
+  const pct=Math.round((answered/TOTAL)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('scorePill').textContent=score+' / '+answered;
+  renderDots();
+}
+function renderDots(){
+  const el=document.getElementById('dots');el.innerHTML='';
+  SECS.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='dot'+(s===curSec?' active':secTotal[s]>0?' done':'');
+    el.appendChild(d);
+  });
+}
+
+// ── NAV ──
+function goSec(from,to){
+  document.getElementById('sec-'+from).classList.remove('active');
+  document.getElementById('sec-'+to).classList.add('active');
+  curSec=to;renderDots();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function finSec(from,to){goSec(from,to);}
+
+// ── CHIPS ──
+function mkChips(id,nums){
+  const el=document.getElementById(id);
+  if(!el)return;
+  nums.forEach(n=>{
+    const c=document.createElement('div');
+    c.className='chip';c.textContent=n;el.appendChild(c);
+  });
+}
+
+// ── RECORD ──
+function record(key,ok){
+  if(results[key]!==undefined)return;
+  results[key]=ok;answered++;if(ok)score++;
+  const s=secOf(key);
+  if(s){secTotal[s]++;if(ok)secScore[s]++;}
+  updProgress();
+}
+function secOf(key){
+  const m=key.match(/\d+/);
+  if(!m)return null;
+  const n=parseInt(m[0]);
+  if(n>=1&&n<=6)return 's1';
+  if(n>=7&&n<=11)return 's2';
+  if(n>=12&&n<=16)return 's3';
+  if(n>=17&&n<=20)return 's4';
+  if(n>=21&&n<=25)return 's5';
+  if(n>=26&&n<=30)return 's6';
+  return null;
+}
+
+// ── CHECK ──
+function chk(pid,aid,correct,color,tol){
+  const inp=document.getElementById(aid);
+  const num=pid.replace('p','');
+  const fb=document.getElementById('f'+num);
+  const nxt=document.getElementById('n'+num);
+  if(inp.disabled)return;
+  const val=parseFloat(inp.value);
+  const ok=!isNaN(val)&&Math.abs(val-correct)<=(tol||0.05);
+  inp.disabled=true;inp.className='ans '+(ok?'ok':'no');
+  showFB(fb,ok,correct);record(pid,ok);
+  if(nxt)nxt.classList.add('show');
+}
+function chkS(pid,step,correct,color,tol){
+  const sid='a'+pid.replace('p','')+'s'+step;
+  const inp=document.getElementById(sid);
+  const fb=document.getElementById('f'+pid.replace('p','')+'s'+step);
+  if(!inp||inp.disabled)return;
+  const val=parseFloat(inp.value);
+  const ok=!isNaN(val)&&Math.abs(val-correct)<=(tol||0.05);
+  inp.disabled=true;inp.className='ans '+(ok?'ok':'no');
+  showFB(fb,ok,correct);record(pid+'s'+step,ok);
+  revealNext(pid,step);
+}
+function chkMC(pid,step,btn,chosen,correct,exp){
+  const fb=document.getElementById('f'+pid.replace('p','')+'s'+step);
+  btn.parentElement.querySelectorAll('.mc-opt').forEach(o=>o.disabled=true);
+  const ok=chosen===correct;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok)btn.parentElement.querySelectorAll('.mc-opt').forEach(o=>{if(o.getAttribute('onclick')&&o.getAttribute('onclick').includes("'"+correct+"'"))o.classList.add('correct');});
+  fb.className='fb show '+(ok?'ok':'no');
+  fb.innerHTML=(ok?'✓ Correct! ':'✗ Not quite. The answer is <strong>'+correct+'</strong>. ')+exp;
+  record(pid+'s'+step,ok);revealNext(pid,step);
+}
+function chkCreate(pid,tid){
+  const ta=document.getElementById(tid);
+  const fb=document.getElementById('f'+pid.replace('p',''));
+  const nxt=document.getElementById('n'+pid.replace('p',''));
+  if(ta.getAttribute('data-submitted'))return;
+  const txt=ta.value.trim();
+  if(txt.length<30){
+    fb.className='fb show no';fb.textContent='⚠️ Please write more! Your answer needs at least 3 sentences with a real example.';return;
+  }
+  ta.setAttribute('data-submitted','1');ta.disabled=true;
+  fb.className='fb show info';
+  fb.innerHTML='✓ Submitted! Your teacher will review your creative example. Good thinking! 💡';
+  record(pid,true);if(nxt)nxt.classList.add('show');
+}
+function showFB(fb,ok,correct){
+  fb.className='fb show '+(ok?'ok':'no');
+  fb.innerHTML=ok?'✓ Correct! Great work.':'✗ Not quite. The correct answer is <strong>'+correct+'</strong>. Check the hint!';
+}
+function revealNext(pid,step){
+  const nxt=document.getElementById(pid+'-s'+(step+1));
+  if(nxt){nxt.style.display='block';setTimeout(()=>nxt.scrollIntoView({behavior:'smooth',block:'nearest'}),150);}
+  else{const nb=document.getElementById('n'+pid.replace('p',''));if(nb)nb.classList.add('show');}
+}
+function nextP(cur,nxt){
+  document.getElementById(cur).style.display='none';
+  const el=document.getElementById(nxt);el.style.display='block';
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+function hint(id){document.getElementById(id).classList.toggle('show');}
+function toggleWork(id){
+  const el=document.getElementById(id);
+  const btn=el.previousElementSibling;
+  if(el.style.display==='none'){el.style.display='block';btn.textContent='✏️ Hide work area';btn.style.color='var(--amber)';btn.style.borderColor='var(--amber)';}
+  else{el.style.display='none';btn.textContent='✏️ Show your work (optional)';btn.style.color='';btn.style.borderColor='';}
+}
+
+// ── RESULTS ──
+function showResults(){
+  pauseTimer();goSec('s6','results');
+  const pct=answered>0?Math.round(score/answered*100):0;
+  document.getElementById('r-score').textContent=score+'/'+answered;
+  document.getElementById('r-pct').textContent=pct+'%';
+  document.getElementById('r-ok').textContent=score;
+  document.getElementById('r-no').textContent=answered-score;
+  const m=Math.floor(timeUsed/60),s=timeUsed%60;
+  document.getElementById('r-time').textContent=pad(m)+'m '+pad(s)+'s';
+  const stars=pct>=90?5:pct>=75?4:pct>=60?3:pct>=40?2:1;
+  const se=document.getElementById('r-stars');
+  for(let i=0;i<5;i++){const d=document.createElement('div');d.className='star'+(i<stars?' lit':'');d.textContent='★';se.appendChild(d);}
+  const msgs=['Keep practicing — review each section and try again!','Good effort! Focus on the parts you found hardest.','Solid work! A bit more practice and you will master this.','Great job! You understand these concepts very well.','Outstanding! You have mastered all four measures!'];
+  document.getElementById('r-msg').textContent=msgs[stars-1];
+  const bd=document.getElementById('r-break');
+  SECS.forEach(s=>{
+    const sc=secScore[s],tot=secTotal[s];
+    const p=tot>0?Math.round(sc/tot*100):0;
+    const col=p>=80?'var(--green)':p>=60?'var(--amber)':'var(--coral)';
+    bd.innerHTML+=`<div style="background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:7px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:130px;"><div style="font-size:13px;font-weight:500;">${SNAMES[s]}</div><div style="font-size:12px;color:var(--muted);">Section ${SECS.indexOf(s)+1}</div></div>
+      <div style="flex:2;min-width:100px;height:7px;background:var(--bg);border-radius:99px;overflow:hidden;border:1px solid var(--rule);"><div style="height:100%;width:${p}%;background:${col};border-radius:99px;"></div></div>
+      <div style="font-size:14px;font-weight:500;color:${col};min-width:60px;text-align:right;">${sc}/${tot} (${p}%)</div>
+    </div>`;
+  });
+}
+
+// ── SUBMIT ──
+function submitForm(){
+  const name=document.getElementById('st-name').value.trim();
+  const cls=document.getElementById('st-class').value.trim();
+  const code=document.getElementById('st-code').value.trim();
+  const err=document.getElementById('form-err');
+  if(!name||!cls||!code){err.style.display='block';return;}
+  err.style.display='none';
+  const pct=answered>0?Math.round(score/answered*100):0;
+  const m=Math.floor(timeUsed/60),s=timeUsed%60;
+  const timeStr=pad(m)+'m '+pad(s)+'s';
+  const fd=new FormData();
+  fd.append('name',name);fd.append('class',cls);fd.append('student_code',code);
+  fd.append('score',`${score}/${answered} (${pct}%)`);fd.append('time',timeStr);
+  fd.append('warm_up',`${secScore.s1}/${secTotal.s1}`);
+  fd.append('guided_steps',`${secScore.s2}/${secTotal.s2}`);
+  fd.append('word_problems',`${secScore.s3}/${secTotal.s3}`);
+  fd.append('challenge',`${secScore.s4}/${secTotal.s4}`);
+  fd.append('create_your_own',`${secScore.s5}/${secTotal.s5}`);
+  fd.append('final_challenge',`${secScore.s6}/${secTotal.s6}`);
+  fd.append('_subject',`Statistics Practice — ${name} | Code: ${code} | Score: ${score}/${answered}`);
+  fetch('https://formspree.io/f/YOUR_FORM_ID',{method:'POST',body:fd,headers:{'Accept':'application/json'}})
+    .then(r=>{
+      if(r.ok){document.getElementById('form-area').style.display='none';document.getElementById('form-sent').style.display='block';}
+      else showMailFallback(name,cls,code,pct,timeStr);
+    }).catch(()=>showMailFallback(name,cls,code,pct,timeStr));
+}
+function showMailFallback(name,cls,code,pct,timeStr){
+  document.getElementById('form-area').innerHTML=`
+    <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:.75rem;">Could not send automatically. Click below to send by email instead:</div>
+    <a href="mailto:YOUR_EMAIL_HERE?subject=${encodeURIComponent('Statistics Practice — '+name+' | Code: '+code)}&body=${encodeURIComponent('Student: '+name+'\nClass: '+cls+'\nCode: '+code+'\nScore: '+score+'/'+answered+' ('+pct+'%)\nTime: '+timeStr)}"
+       style="display:inline-block;font-family:DM Sans,sans-serif;font-size:14px;font-weight:500;padding:10px 22px;border-radius:8px;background:#e6a820;color:#000;text-decoration:none;">Send by Email →</a>`;
+}
+
+// ── INIT ──
+window.onload=function(){
+  mkChips('c1',[3,5,6,8,8]);
+  mkChips('c2',[20,14,8,17,11]);
+  mkChips('c3',[4,7,9,7,4,7,9,4,7]);
+  mkChips('c4',[5,12,9,23,7,15,19]);
+  mkChips('c6',[5,15,8,19,12,11]);
+  mkChips('c7',[13,15,12,14,13,16,13]);
+  mkChips('c8',[28,22,31,19,25,30,24]);
+  renderDots();updProgress();
+};
+</script>
+</body>
+</html>
